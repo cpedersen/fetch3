@@ -1,26 +1,27 @@
 'use strict';
 
-function getDogImages(num) {
-  fetch(`https://dog.ceo/api/breeds/image/random/${num}`)
+function getDogImage(dog_type) {
+  fetch(`https://dog.ceo/api/breed/${dog_type}/images/random`)
     .then(response => response.json())
     .then(responseJson => 
-      printResults(responseJson));
+      printResults(responseJson, dog_type));
     /*.catch(error => alert('Something went wrong. Try again later.'));*/
 }
 
-function printResults(responseJson) {
-  // append the dog images
-  const array_urls = Object.values(responseJson.message);
-  const num = array_urls.length;
-  console.log(`${num} random dogs selected`);
-  
-  for (let i=0; i < num; i++) {
-    console.log(`Dog: ${array_urls[i]}`)
-    $(
-      `<img src="${array_urls[i]}" class="dog-img">`
-    ).appendTo('#results-img');
-  }
+function printResults(responseJson, dog_type) {
+  // replace with the dog image
+  if (responseJson.status != "success") {
+    console.log(`Couldn't find a ${dog_type}`);
+    $('.results-img').replaceWith(
+      `<img src="OhShit.jpg" class="results-img" width="300" height="300">`
+    )
+  } else {
+    console.log(`Found a ${dog_type}`);
+    $('.results-img').replaceWith(
+      `<img src="${responseJson.message}" class="results-img">`
+    )
 
+  }
   //display the results section
   $('.results').removeClass('hidden');
 }
@@ -28,8 +29,8 @@ function printResults(responseJson) {
 function watchForm() {
   $('form').submit(event => {
     event.preventDefault();
-    let num_dogs = $("#how-many").val();
-    getDogImages(num_dogs);
+    let dog_type = $("#dog-type").val();
+    getDogImage(dog_type);
   });
 }
 
